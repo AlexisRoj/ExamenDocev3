@@ -19,6 +19,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
@@ -91,18 +93,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.sign_in_button_google:
-                mInicioSeccion();
+                mInicioSeccionGoogle();
                 break;
             case R.id.sign_out_button_google:
+                mCerrarSesionGoogle();
                 break;
         }
     }
 
     /**
-     * Método encargado de gestionar los elementos del inicio
-     * de sesión
+     * Método encargado de gestionar los elementos del cerrar
+     * sesión de Google
      * */
-    private void mInicioSeccion() {
+    private void mCerrarSesionGoogle() {
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                .setResultCallback(new ResultCallback<Status>() {
+            @Override
+            public void onResult(@NonNull Status status) {
+                //Limpia el textview
+                textLogin.setText(null);
+            }
+        });
+    }
+
+    /**
+     * Método encargado de gestionar los elementos del inicio
+     * de sesión de Google
+     * */
+    private void mInicioSeccionGoogle() {
         Intent signIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signIntent, SIGN_IN_GOOGLE_REQUEST_CODE);
     }
