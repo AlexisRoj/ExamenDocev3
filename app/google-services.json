@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "290011744456",
+    "project_id": "examendocev3"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:290011744456:android:dfcbfb62786b8d5e",
+        "android_client_info": {
+          "package_name": "com.innovagenesis.aplicaciones.android.examendocev3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "290011744456-852a677ua7gpr1lv3vgk6rmhbevoue32.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "290011744456-tas4r0ve54l7f25uae3s7uh8hhhke4gp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.innovagenesis.aplicaciones.android.examendocev3",
+            "certificate_hash": "f0c36214d62b0efcb9eda9d509c2aa26c59743f1"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTDu0HyrXCjZm8i09UjNPzTi36r6jh_kw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
