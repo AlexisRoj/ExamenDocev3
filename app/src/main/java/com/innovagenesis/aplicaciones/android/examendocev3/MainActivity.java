@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity
             android.Manifest.permission.READ_CONTACTS
     };
 
+    private FloatingActionButton fab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -55,23 +57,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                ContactosFragment fragment = new ContactosFragment();
-                FragmentManager  fragmentManager = getSupportFragmentManager();
-
-                fragmentManager.beginTransaction()
-                        .replace(R.id.contenedor,fragment)
-                        .addToBackStack(null)
-                        .commit();
-
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         textLogin = (TextView) findViewById(R.id.txtview_email); //Muestra correo
 
@@ -140,6 +125,7 @@ public class MainActivity extends AppCompatActivity
             public void onResult(@NonNull Status status) {
                 //Limpia el textview
                 textLogin.setText(null);
+                fab.setVisibility(View.GONE);
             }
         });
     }
@@ -179,6 +165,29 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInAccount account = result.getSignInAccount();
             if (account!= null){
                 textLogin.setText(account.getEmail());
+
+
+                fab = (FloatingActionButton) findViewById(R.id.fab);
+
+                fab.setVisibility(View.VISIBLE);
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        ContactosFragment fragment = new ContactosFragment();
+                        FragmentManager  fragmentManager = getSupportFragmentManager();
+
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.contenedor,fragment)
+                                .addToBackStack(null)
+                                .commit();
+
+                    }
+                });
+
+
+
+
             }
         }
     }
