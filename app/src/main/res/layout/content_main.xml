@@ -47,9 +47,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="#FFF"
             android:elevation="9dp"
             android:textAllCaps="false"
+            android:background="#FFF"
             android:text="@string/sign_out"
             tools:targetApi="lollipop" />
 
