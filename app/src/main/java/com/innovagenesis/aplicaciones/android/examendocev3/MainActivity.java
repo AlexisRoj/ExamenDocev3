@@ -1,10 +1,14 @@
 package com.innovagenesis.aplicaciones.android.examendocev3;
 
+import android.*;
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,15 +28,28 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.innovagenesis.aplicaciones.android.examendocev3.contactos.ContactosFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
     public static final int SIGN_IN_GOOGLE_REQUEST_CODE = 1;
     private TextView textLogin;
 
+    private static final int REQUEST_CODE = 1;
+    private static final String[] PERMISOS = {
+            android.Manifest.permission.READ_CONTACTS
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        //Pide los permisos
+        int leer = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
+        if (leer == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, PERMISOS, REQUEST_CODE);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
