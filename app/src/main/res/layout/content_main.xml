@@ -1,60 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="80dp"
+    android:id="@+id/contenedor"
+    android:layout_marginTop="50dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:src="@drawable/splash2"
-        android:layout_gravity="center"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:text="Asistente de Seguridad"
-        android:textAlignment="center"/>
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/splash2"
+                android:layout_gravity="center"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="Email"
-        android:id="@+id/txtview_email"
-        android:textAlignment="center"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:text="Asistente de Seguridad"
+                android:textAlignment="center"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:text="Email"
+                android:id="@+id/txtview_email"
+                android:textAlignment="center"/>
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button_google"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/sign_out_button_google"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:elevation="9dp"
-            android:textAllCaps="false"
-            android:background="#FFF"
-            android:text="@string/sign_out"
-            tools:targetApi="lollipop" />
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/sign_in_button_google"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    />
 
-    </LinearLayout>
+                <Button
+                    android:id="@+id/sign_out_button_google"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:elevation="9dp"
+                    android:textAllCaps="false"
+                    android:background="#FFF"
+                    android:text="@string/sign_out"
+                    tools:targetApi="lollipop" />
 
+            </LinearLayout>
 
-
-</LinearLayout>
+        </LinearLayout>
+</RelativeLayout>
