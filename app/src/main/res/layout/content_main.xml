@@ -21,15 +21,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="24sp"
-                android:text="Asistente de Seguridad"
+                android:text="@string/asistente_de_seguridad"
                 android:textAlignment="center"/>
 
             <TextView
+                android:layout_margin="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
-                android:text="Email"
+                android:text="@string/email"
                 android:id="@+id/txtview_email"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/zonas_seguras"
+                android:id="@+id/txtview_geofence"
                 android:textAlignment="center"/>
 
             <LinearLayout

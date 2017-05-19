@@ -5,4 +5,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="asistente_de_seguridad">Asistente de Seguridad</string>
+    <string name="email">Email</string>
+    <string name="zonas_seguras">A partir de este momento usted va a ser alertado\n  de las zonas seguras e inseguras</string>
 </resources>

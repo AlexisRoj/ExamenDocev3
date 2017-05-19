@@ -24,7 +24,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -52,11 +52,9 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private GoogleApiClient mApiClient;
     public static final int SIGN_IN_GOOGLE_REQUEST_CODE = 1;
-    private TextView textLogin;
+    private TextView textLogin, txtSeguro;
 
-    private SimpleGeofence mAndroidGeofence;
     private List<Geofence> mGeofence;
-    private PendingIntent mGeofenceRequestIntent;
 
     private static final int REQUEST_CODE = 1;
     private static final String[] PERMISOS = {
@@ -83,6 +81,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         textLogin = (TextView) findViewById(R.id.txtview_email); //Muestra correo
+        txtSeguro = (TextView) findViewById(R.id.txtview_geofence); //Mensaje GeoFence
+
+        textLogin.setText(null);
+        txtSeguro.setText(null);
 
         /** Inicializacion de complementos para login de Google*/
         findViewById(R.id.sign_in_button_google).setOnClickListener(this);
@@ -98,15 +100,18 @@ public class MainActivity extends AppCompatActivity
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        if (!disponiblesGooglePlayServices()){
+        if (!disponiblesGooglePlayServices()) {
             Toast.makeText(MainActivity.this,
                     "Servicios de Google Play no disponibles", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
-    public void crearGeofences(){
-        mAndroidGeofence = new SimpleGeofence(
+    /**
+     * Inicializa el GeoFence
+     */
+    public void crearGeofences() {
+        SimpleGeofence mAndroidGeofence = new SimpleGeofence(
                 ANDROID_ID,
                 ANDROID_LATITUDE,
                 ANDROID_LONGITUDE,
@@ -166,6 +171,7 @@ public class MainActivity extends AppCompatActivity
                     public void onResult(@NonNull Status status) {
                         //Limpia el textview
                         textLogin.setText(null);
+                        txtSeguro.setText(null);
                         fab.setVisibility(View.GONE);
                     }
                 });
@@ -211,11 +217,11 @@ public class MainActivity extends AppCompatActivity
                         .build();
 
                 mApiClient.connect();
-
                 mGeofence = new ArrayList<>();
                 crearGeofences();
 
                 textLogin.setText(account.getEmail());
+                txtSeguro.setText(getString(R.string.zonas_seguras));
 
                 fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -223,7 +229,7 @@ public class MainActivity extends AppCompatActivity
                 fab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
+                        /** Carga los contactos en el fragmeto*/
                         ContactosFragment fragment = new ContactosFragment();
                         FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -246,15 +252,18 @@ public class MainActivity extends AppCompatActivity
                 connectionResult.getErrorMessage());
     }
 
+    /**
+     * Conecta con el GeoFence
+     */
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
         int leer = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
-        if(leer == PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(this,PERMISOS,1);
+        if (leer == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, PERMISOS, 1);
         }
-        mGeofenceRequestIntent = getGeofenceTransitionPendingIntent();
-        LocationServices.GeofencingApi.addGeofences(mApiClient,mGeofence,mGeofenceRequestIntent);
+        PendingIntent mGeofenceRequestIntent = getGeofenceTransitionPendingIntent();
+        LocationServices.GeofencingApi.addGeofences(mApiClient, mGeofence, mGeofenceRequestIntent);
         Toast.makeText(MainActivity.this, "Iniciando servicio de Geofence",
                 Toast.LENGTH_SHORT).show();
         //finish();
@@ -265,8 +274,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Coprueba si el servicio se encuentra disponible
+     */
     private boolean disponiblesGooglePlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int resultCode = googleAPI.isGooglePlayServicesAvailable(this);
         if (ConnectionResult.SUCCESS == resultCode) {
             Toast.makeText(MainActivity.this, "Servicios de Google Play disponibles",
                     Toast.LENGTH_SHORT).show();
