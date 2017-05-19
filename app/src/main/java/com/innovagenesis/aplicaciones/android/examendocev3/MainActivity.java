@@ -102,11 +102,7 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(MainActivity.this,
                     "Servicios de Google Play no disponibles", Toast.LENGTH_SHORT).show();
             finish();
-            return;
         }
-
-
-
     }
 
     public void crearGeofences(){
@@ -119,11 +115,8 @@ public class MainActivity extends AppCompatActivity
                 Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL,
                 ANDROID_LOITERING_DELAY
         );
-
         mGeofence.add(mAndroidGeofence.toGeofence());
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -222,8 +215,6 @@ public class MainActivity extends AppCompatActivity
                 mGeofence = new ArrayList<>();
                 crearGeofences();
 
-
-
                 textLogin.setText(account.getEmail());
 
                 fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -262,14 +253,11 @@ public class MainActivity extends AppCompatActivity
         if(leer == PackageManager.PERMISSION_DENIED){
             ActivityCompat.requestPermissions(this,PERMISOS,1);
         }
-
         mGeofenceRequestIntent = getGeofenceTransitionPendingIntent();
         LocationServices.GeofencingApi.addGeofences(mApiClient,mGeofence,mGeofenceRequestIntent);
-
-        Toast.makeText(MainActivity.this, "Iniciando servicio de Geofence", Toast.LENGTH_SHORT).show();
-
+        Toast.makeText(MainActivity.this, "Iniciando servicio de Geofence",
+                Toast.LENGTH_SHORT).show();
         //finish();
-
     }
 
     @Override
@@ -280,7 +268,8 @@ public class MainActivity extends AppCompatActivity
     private boolean disponiblesGooglePlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (ConnectionResult.SUCCESS == resultCode) {
-            Toast.makeText(MainActivity.this, "Servicios de Google Play disponibles", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Servicios de Google Play disponibles",
+                    Toast.LENGTH_SHORT).show();
             return true;
         } else return false;
     }
