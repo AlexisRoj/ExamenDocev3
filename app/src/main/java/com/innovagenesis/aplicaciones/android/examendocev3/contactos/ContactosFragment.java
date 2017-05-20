@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,8 @@ public class ContactosFragment extends Fragment {
     private Cursor cursor;
     private int counter = 0;
 
+    private FloatingActionButton fab;
+
     public ContactosFragment() {
         // Required empty public constructor
     }
@@ -47,6 +50,7 @@ public class ContactosFragment extends Fragment {
         pDialog.setCancelable(false);
         pDialog.show();
 
+        fab = (FloatingActionButton)view.findViewById(R.id.fab);
         mListView = (ListView) view.findViewById(R.id.list_view_contactos);
         updateBarHandler = new android.os.Handler();
 
@@ -59,9 +63,10 @@ public class ContactosFragment extends Fragment {
             }
         }).start();
 
-
         return view;
     }
+
+
 
     /**
      * Clase encargada de extraer los contactos del telefono
@@ -158,4 +163,5 @@ public class ContactosFragment extends Fragment {
             }, 500);
         }
     }
+
 }
