@@ -19,6 +19,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -34,6 +41,9 @@ import com.innovagenesis.aplicaciones.android.examendocev3.contactos.ContactosFr
 import com.innovagenesis.aplicaciones.android.examendocev3.geofense.GeofenceTransitionsIntentService;
 import com.innovagenesis.aplicaciones.android.examendocev3.geofense.SimpleGeofence;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +56,7 @@ import static com.innovagenesis.aplicaciones.android.examendocev3.geofense.Const
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener,
-        GoogleApiClient.ConnectionCallbacks {
+        GoogleApiClient.ConnectionCallbacks, FacebookCallback<LoginResult> {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private GoogleApiClient mGoogleApiClient;
@@ -55,6 +65,10 @@ public class MainActivity extends AppCompatActivity
     private TextView textLogin, txtSeguro;
 
     private List<Geofence> mGeofence;
+
+    LoginButton loginButton;
+    CallbackManager callbackManager;
+
 
     private static final int REQUEST_CODE = 1;
     private static final String[] PERMISOS = {
@@ -70,8 +84,11 @@ public class MainActivity extends AppCompatActivity
         //Pide los permisos
         int leer = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS);
         int gps = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int internet = ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET);
 
-        if ((leer == PackageManager.PERMISSION_DENIED) || (gps == PackageManager.PERMISSION_DENIED)) {
+        if ((leer == PackageManager.PERMISSION_DENIED)
+                || (gps == PackageManager.PERMISSION_DENIED)
+                || (internet == PackageManager.PERMISSION_DENIED)) {
             ActivityCompat.requestPermissions(this, PERMISOS, REQUEST_CODE);
         }
 
@@ -79,6 +96,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        callbackManager = CallbackManager.Factory.create();
+        loginButton = (LoginButton) findViewById(R.id.login_button_facebook);
+        loginButton.setReadPermissions("email");
+        loginButton.registerCallback(callbackManager, this);
 
         textLogin = (TextView) findViewById(R.id.txtview_email); //Muestra correo
         txtSeguro = (TextView) findViewById(R.id.txtview_geofence); //Mensaje GeoFence
@@ -165,16 +189,18 @@ public class MainActivity extends AppCompatActivity
      * sesión de Google
      */
     private void mCerrarSesionGoogle() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        //Limpia el textview
-                        textLogin.setText(null);
-                        txtSeguro.setText(null);
-                        fab.setVisibility(View.GONE);
-                    }
-                });
+        if (mGoogleApiClient != null) {
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient)
+                    .setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            //Limpia el textview
+                            textLogin.setText(null);
+                            txtSeguro.setText(null);
+                            fab.setVisibility(View.GONE);
+                        }
+                    });
+        }
     }
 
     /**
@@ -198,7 +224,8 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == SIGN_IN_GOOGLE_REQUEST_CODE) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleSignInResult(result);
-        }
+        } else
+            callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     /***
@@ -210,37 +237,46 @@ public class MainActivity extends AppCompatActivity
             GoogleSignInAccount account = result.getSignInAccount();
             if (account != null) {
 
-                mApiClient = new GoogleApiClient.Builder(this)
-                        .addApi(LocationServices.API)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .build();
-
-                mApiClient.connect();
-                mGeofence = new ArrayList<>();
-                crearGeofences();
+                mIniciarGeofences();//Inicia el Geofences
 
                 textLogin.setText(account.getEmail());
                 txtSeguro.setText(getString(R.string.zonas_seguras));
 
-                fab = (FloatingActionButton) findViewById(R.id.fab);
-
-                fab.setVisibility(View.VISIBLE);
-                fab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        /** Carga los contactos en el fragmeto*/
-                        ContactosFragment fragment = new ContactosFragment();
-                        FragmentManager fragmentManager = getSupportFragmentManager();
-
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.contenedor, fragment)
-                                .addToBackStack(null)
-                                .commit();
-                    }
-                });
+                botonFlotante(); // Inica el boton Flotante
             }
         }
+    }
+
+    private void botonFlotante() {
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /** Carga los contactos en el fragmeto*/
+                ContactosFragment fragment = new ContactosFragment();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+
+                fragmentManager.beginTransaction()
+                        .replace(R.id.contenedor, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+    }
+
+    /**
+     * Encargado de iniciar el Geofences
+     */
+    private void mIniciarGeofences() {
+        mApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        mApiClient.connect();
+        mGeofence = new ArrayList<>();
+        crearGeofences();
     }
 
     /**
@@ -291,4 +327,59 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
+    /**
+     * Metodo confirmacion inicio de seccion facebook
+     */
+    @Override
+    public void onSuccess(LoginResult loginResult) {
+
+        Toast.makeText(this, R.string.successFacebook, Toast.LENGTH_SHORT).show();
+        /** Pide el correo*/
+        GraphRequest request = GraphRequest.newMeRequest(
+                loginResult.getAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        mIniciarGeofences();//Inicia el Geofences
+                        String email = null;
+                        try {
+                            email = object.getString("email");
+                            textLogin.setText(email);
+                            txtSeguro.setText(getString(R.string.zonas_seguras));
+                            botonFlotante(); // Inica el boton Flotante
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        );
+        Bundle parameters = new Bundle();
+        //parameters.putString("fields", "id,name,email,gender,birthday");
+        parameters.putString("fields", "email");
+        request.setParameters(parameters);
+        request.executeAsync();
+
+    }
+
+    /**
+     * Metodo procesos en la cancelacion inicio sesion facebook
+     */
+    @Override
+    public void onCancel() {
+        Toast.makeText(this, R.string.cancelFacebook, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Metodo a ejecutar cuando existe un error en el login de facebook
+     */
+    @Override
+    public void onError(FacebookException error) {
+        Toast.makeText(this, getString(R.string.errorFacebook)
+                + error, Toast.LENGTH_SHORT).show();
+
+    }
+
+
 }

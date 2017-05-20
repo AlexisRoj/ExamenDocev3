@@ -8,4 +8,8 @@
     <string name="asistente_de_seguridad">Asistente de Seguridad</string>
     <string name="email">Email</string>
     <string name="zonas_seguras">A partir de este momento usted va a ser alertado\n  de las zonas seguras e inseguras</string>
+    <string name="facebook_app_id">314551282314955</string>
+    <string name="errorFacebook">Ocurrió un error al iniciar sesión:</string>
+    <string name="cancelFacebook">El inicio de sesión ha sido cancelado</string>
+    <string name="successFacebook">Inicio de sesión satisfactorio</string>
 </resources>
