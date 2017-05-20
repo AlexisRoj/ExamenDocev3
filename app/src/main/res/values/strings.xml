@@ -12,4 +12,7 @@
     <string name="errorFacebook">Ocurrió un error al iniciar sesión:</string>
     <string name="cancelFacebook">El inicio de sesión ha sido cancelado</string>
     <string name="successFacebook">Inicio de sesión satisfactorio</string>
+    <string name="googleNoDisponible">Servicios de Google Play no disponibles</string>
+    <string name="iniciandoGeofences">Iniciando servicio de Geofence</string>
+    <string name="servicioDisponible">Servicios de Google Play disponibles</string>
 </resources>

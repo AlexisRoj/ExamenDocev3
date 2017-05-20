@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity
     public static final int SIGN_IN_GOOGLE_REQUEST_CODE = 1;
     private TextView textLogin, txtSeguro;
 
+    AccessTokenTracker accessTokenTracker;
     private List<Geofence> mGeofence;
 
     LoginButton loginButton;
@@ -103,6 +106,19 @@ public class MainActivity extends AppCompatActivity
         loginButton = (LoginButton) findViewById(R.id.login_button_facebook);
         loginButton.setReadPermissions("email");
         loginButton.registerCallback(callbackManager, this);
+        /* Logut de Facebook*/
+        accessTokenTracker = new AccessTokenTracker() {
+            /** Finaliza sesión en facebook*/
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
+                                                       AccessToken currentAccessToken) {
+                if (currentAccessToken == null) {
+                    //write your code here what to do when user logout
+                    Toast.makeText(MainActivity.this, "Finalizo sesión", Toast.LENGTH_SHORT).show();
+                    mDesloguearse();
+                }
+            }
+        };
 
         textLogin = (TextView) findViewById(R.id.txtview_email); //Muestra correo
         txtSeguro = (TextView) findViewById(R.id.txtview_geofence); //Mensaje GeoFence
@@ -126,9 +142,11 @@ public class MainActivity extends AppCompatActivity
 
         if (!disponiblesGooglePlayServices()) {
             Toast.makeText(MainActivity.this,
-                    "Servicios de Google Play no disponibles", Toast.LENGTH_SHORT).show();
+                    R.string.googleNoDisponible, Toast.LENGTH_SHORT).show();
             finish();
         }
+
+
     }
 
     /**
@@ -141,7 +159,8 @@ public class MainActivity extends AppCompatActivity
                 ANDROID_LONGITUDE,
                 ANDROID_RADIUS_METERS,
                 GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL,
+                Geofence.GEOFENCE_TRANSITION_ENTER
+                        | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL,
                 ANDROID_LOITERING_DELAY
         );
         mGeofence.add(mAndroidGeofence.toGeofence());
@@ -195,12 +214,19 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onResult(@NonNull Status status) {
                             //Limpia el textview
-                            textLogin.setText(null);
-                            txtSeguro.setText(null);
-                            fab.setVisibility(View.GONE);
+                            mDesloguearse();
                         }
                     });
         }
+    }
+
+    /**
+     * Limpia al desloguear la cuenta
+     * */
+    private void mDesloguearse() {
+        textLogin.setText(null);
+        txtSeguro.setText(null);
+        fab.setVisibility(View.GONE);
     }
 
     /**
@@ -300,7 +326,7 @@ public class MainActivity extends AppCompatActivity
         }
         PendingIntent mGeofenceRequestIntent = getGeofenceTransitionPendingIntent();
         LocationServices.GeofencingApi.addGeofences(mApiClient, mGeofence, mGeofenceRequestIntent);
-        Toast.makeText(MainActivity.this, "Iniciando servicio de Geofence",
+        Toast.makeText(MainActivity.this, R.string.iniciandoGeofences,
                 Toast.LENGTH_SHORT).show();
         //finish();
     }
@@ -317,7 +343,7 @@ public class MainActivity extends AppCompatActivity
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int resultCode = googleAPI.isGooglePlayServicesAvailable(this);
         if (ConnectionResult.SUCCESS == resultCode) {
-            Toast.makeText(MainActivity.this, "Servicios de Google Play disponibles",
+            Toast.makeText(MainActivity.this, R.string.servicioDisponible,
                     Toast.LENGTH_SHORT).show();
             return true;
         } else return false;
